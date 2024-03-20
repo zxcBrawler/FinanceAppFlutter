@@ -1,5 +1,5 @@
 import 'package:finance_app_firebase/core/router/router_utils.dart';
-import 'package:finance_app_firebase/feature/presentation/ui/balance_page.dart';
+
 import 'package:finance_app_firebase/feature/presentation/ui/dashboard.dart';
 import 'package:finance_app_firebase/feature/presentation/ui/login_page.dart';
 import 'package:finance_app_firebase/feature/presentation/ui/main_page.dart';
@@ -42,13 +42,6 @@ final router =
             parentNavigatorKey: _shellNavigatorKey,
             pageBuilder: (context, state) {
               return const NoTransitionPage(child: Dashboard());
-            }),
-        GoRoute(
-            path: Pages.balance.screenPath,
-            name: Pages.balance.screenName,
-            parentNavigatorKey: _shellNavigatorKey,
-            pageBuilder: (context, state) {
-              return const NoTransitionPage(child: Balance());
             }),
         GoRoute(
             path: Pages.transactions.screenPath,

@@ -1,6 +1,12 @@
 import 'package:finance_app_firebase/config/app_colors.dart';
 import 'package:finance_app_firebase/core/router/app_router.dart';
 import 'package:finance_app_firebase/core/router/router_utils.dart';
+import 'package:finance_app_firebase/core/utils/app_validator.dart';
+import 'package:finance_app_firebase/di/service.dart';
+import 'package:finance_app_firebase/feature/data/model/login_dto.dart';
+import 'package:finance_app_firebase/feature/presentation/bloc/auth/auth_bloc.dart';
+import 'package:finance_app_firebase/feature/presentation/bloc/auth/auth_event.dart';
+import 'package:finance_app_firebase/feature/presentation/bloc/auth/auth_state.dart';
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatefulWidget {
@@ -11,6 +17,16 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  var appValidator = AppValidator();
+  final authBloc = service<AuthBloc>();
+  final TextEditingController _emailController =
+      TextEditingController(text: '');
+  final TextEditingController _passwordController =
+      TextEditingController(text: '');
+
+  final LoginDto loginDto = LoginDto();
+
   bool obscureText = true;
 
   @override
@@ -36,27 +52,33 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 20),
                 Form(
+                  key: _formKey,
                   child: Column(
                     children: [
                       Container(
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(40),
+                          borderRadius: BorderRadius.circular(10),
                           color: Colors.grey.withOpacity(0.1),
                         ),
                         child: ClipRRect(
-                          borderRadius: BorderRadius.circular(40),
-                          child: TextFormField(
-                            decoration: const InputDecoration(
-                              labelText: "Email",
-                              labelStyle: TextStyle(
-                                  color: AppColors.white, fontSize: 18),
-                              prefixIcon:
-                                  Icon(Icons.email, color: AppColors.white),
-                              focusedBorder: InputBorder.none,
-                              enabledBorder: InputBorder.none,
-                              hintText: "Enter email",
-                              hintStyle: TextStyle(
-                                  color: Color.fromARGB(171, 157, 149, 168)),
+                          borderRadius: BorderRadius.circular(10),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: TextFormField(
+                              controller: _emailController,
+                              validator: appValidator.validateEmail,
+                              decoration: const InputDecoration(
+                                labelText: "Email",
+                                labelStyle: TextStyle(
+                                    color: AppColors.white, fontSize: 18),
+                                prefixIcon:
+                                    Icon(Icons.email, color: AppColors.white),
+                                focusedBorder: InputBorder.none,
+                                enabledBorder: InputBorder.none,
+                                hintText: "Enter email",
+                                hintStyle: TextStyle(
+                                    color: Color.fromARGB(171, 157, 149, 168)),
+                              ),
                             ),
                           ),
                         ),
@@ -64,37 +86,42 @@ class _LoginPageState extends State<LoginPage> {
                       const SizedBox(height: 15),
                       Container(
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(40),
+                          borderRadius: BorderRadius.circular(10),
                           color: Colors.grey.withOpacity(0.1),
                         ),
                         child: ClipRRect(
-                          borderRadius: BorderRadius.circular(40),
-                          child: TextFormField(
-                            obscureText: obscureText,
-                            decoration: InputDecoration(
-                              labelText: "Password",
-                              labelStyle: const TextStyle(
-                                  color: AppColors.white, fontSize: 18),
-                              prefixIcon: const Icon(Icons.lock,
-                                  color: AppColors.white),
-                              suffixIcon: IconButton(
-                                icon: Icon(
-                                  obscureText
-                                      ? Icons.visibility
-                                      : Icons.visibility_off,
-                                  color: AppColors.white,
+                          borderRadius: BorderRadius.circular(10),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: TextFormField(
+                              controller: _passwordController,
+                              validator: appValidator.validatePassword,
+                              obscureText: obscureText,
+                              decoration: InputDecoration(
+                                labelText: "Password",
+                                labelStyle: const TextStyle(
+                                    color: AppColors.white, fontSize: 18),
+                                prefixIcon: const Icon(Icons.lock,
+                                    color: AppColors.white),
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    obscureText
+                                        ? Icons.visibility
+                                        : Icons.visibility_off,
+                                    color: AppColors.white,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      obscureText = !obscureText;
+                                    });
+                                  },
                                 ),
-                                onPressed: () {
-                                  setState(() {
-                                    obscureText = !obscureText;
-                                  });
-                                },
+                                focusedBorder: InputBorder.none,
+                                enabledBorder: InputBorder.none,
+                                hintText: "Enter password",
+                                hintStyle: const TextStyle(
+                                    color: Color.fromARGB(171, 157, 149, 168)),
                               ),
-                              focusedBorder: InputBorder.none,
-                              enabledBorder: InputBorder.none,
-                              hintText: "Enter password",
-                              hintStyle: const TextStyle(
-                                  color: Color.fromARGB(171, 157, 149, 168)),
                             ),
                           ),
                         ),
@@ -104,9 +131,7 @@ class _LoginPageState extends State<LoginPage> {
                         children: [
                           Expanded(
                             child: ElevatedButton(
-                              onPressed: () {
-                                router.go(Pages.dashboard.screenPath);
-                              },
+                              onPressed: _submit,
                               style: ElevatedButton.styleFrom(
                                   backgroundColor: AppColors.tealPrimary),
                               child: const Padding(
@@ -122,18 +147,7 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 20),
-                      const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "Forgot password?",
-                            style: TextStyle(
-                                color: AppColors.tealPrimary, fontSize: 18),
-                          )
-                        ],
-                      ),
-                      const SizedBox(height: 100),
+                      const SizedBox(height: 120),
                       Padding(
                         padding: const EdgeInsets.all(20.0),
                         child: Row(
@@ -168,5 +182,27 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ),
     );
+  }
+
+  void _submit() {
+    if (_formKey.currentState!.validate()) {
+      loginDto.email = _emailController.text;
+      loginDto.password = _passwordController.text;
+      authBloc.add(Login(loginDto: loginDto));
+
+      authBloc.stream.listen((event) {
+        if (event is AuthError) {
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text(event.message)));
+        }
+        if (event is AuthDone) {
+          router.go(Pages.dashboard.screenPath);
+        }
+        if (event is AuthLoading) {
+          ScaffoldMessenger.of(_formKey.currentContext!)
+              .showSnackBar(const SnackBar(content: Text("Loading...")));
+        }
+      });
+    }
   }
 }

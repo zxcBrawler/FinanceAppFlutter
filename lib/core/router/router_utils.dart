@@ -3,7 +3,6 @@ enum Pages {
   register,
   mainScreen,
   dashboard,
-  balance,
   transactions,
   profile,
 }
@@ -15,7 +14,6 @@ extension AppPageExtension on Pages {
       Pages.register => '/register',
       Pages.mainScreen => '/main',
       Pages.dashboard => '/dashboard',
-      Pages.balance => '/balance',
       Pages.transactions => '/transactions',
       Pages.profile => '/profile',
     };
@@ -27,7 +25,6 @@ extension AppPageExtension on Pages {
       Pages.register => 'register',
       Pages.mainScreen => 'main',
       Pages.dashboard => 'Dashboard',
-      Pages.balance => 'Balance',
       Pages.transactions => 'Transactions',
       Pages.profile => 'Profile',
     };

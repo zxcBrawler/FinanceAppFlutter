@@ -34,12 +34,9 @@ class _MainPageState extends State<MainPage> {
               break;
 
             case 1:
-              router.push(Pages.balance.screenPath);
-              break;
-            case 2:
               router.push(Pages.transactions.screenPath);
               break;
-            case 3:
+            case 2:
               router.push(Pages.profile.screenPath);
               break;
           }
@@ -53,10 +50,6 @@ class _MainPageState extends State<MainPage> {
           BottomNavigationBarItem(
             icon: Icon(Icons.dashboard),
             label: "Dashboard",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.account_balance),
-            label: "Balance",
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.history),
